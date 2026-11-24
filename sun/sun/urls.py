@@ -18,8 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from moon import views
 
+handler403 = 'moon.views.custom_403'
+handler404 = 'moon.views.custom_404'
+handler500 = 'moon.views.custom_500'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
     
     path("history/", views.history, name="history"),
     path("vhod/", views.vhod, name="vhod"),

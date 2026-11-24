@@ -29,6 +29,20 @@ from .models import (
     Service,
 )
 
+from django.shortcuts import render
+
+
+def custom_403(request, exception=None):
+    return render(request, '403.html', status=403)
+
+
+def custom_404(request, exception=None):
+    return render(request, '404.html', status=404)
+
+
+def custom_500(request):
+    return render(request, '500.html', status=500)
+
 def main(request):
     return TemplateResponse(request, 'main.html')
 
@@ -492,9 +506,10 @@ def _cart_totals(services):
     hours = total_duration // 60
     minutes = total_duration % 60
     if hours and minutes:
-        duration_display = f"{hours} ч {minutes} мин"
+        duration_display = f"{hours} ч {minutes} мин" 
     elif hours:
         duration_display = f"{hours} ч"
     else:
         duration_display = f"{minutes} мин"
-    return total_cost, total_duration, duration_display
+    return total_cost, total_duration, duration_display  
+
