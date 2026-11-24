@@ -34,7 +34,25 @@
                     <h2 class="auth-form__title">Вход</h2>
                     <p class="auth-form__subtitle">Рады видеть вас снова</p>
 
-                    <form class="auth-form" action="#" method="POST" id="loginForm" novalidate>
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li class="{{ message.tags }}">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="auth-error" style="display:block;">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <form class="auth-form"
+                          action="{% url 'vhod' %}"
+                          method="POST"
+                          id="loginForm"
+                          novalidate>
                         {% csrf_token %}
 
                         <div class="auth-field">
@@ -44,10 +62,13 @@
                                 id="phone"
                                 name="phone"
                                 placeholder="+7 (999) 123-45-67"
+                                value="{{ form.phone.value|default_if_none:'' }}"
                                 required
                                 pattern="\+7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}"
                             >
-                            <span class="auth-error" id="phoneError"></span>
+                            <span class="auth-error" id="phoneError">
+                                {{ form.phone.errors }}
+                            </span>
                         </div>
 
                         <div class="auth-field">
@@ -60,7 +81,9 @@
                                 required
                                 minlength="6"
                             >
-                            <span class="auth-error" id="passwordError"></span>
+                            <span class="auth-error" id="passwordError">
+                                {{ form.password.errors }}
+                            </span>
                         </div>
 
                         <div class="auth-actions">
@@ -74,6 +97,11 @@
                         </div>
 
                     </form>
+
+                    <p class="auth-form__subtitle" style="margin-top:16px;">
+                        Нет аккаунта?
+                        <a href="{% url 'registracia' %}">Зарегистрироваться</a>
+                    </p>
                 </div>
             </div>
 
@@ -81,7 +109,7 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('loginForm');
             const phoneInput = document.getElementById('phone');
             const passwordInput = document.getElementById('password');
@@ -100,7 +128,7 @@
                 }
             }
 
-            phoneInput.addEventListener('input', function() {
+            phoneInput.addEventListener('input', function () {
                 const value = this.value.replace(/\D/g, '');
                 if (this.value.length === 0) {
                     toggleError(this, phoneError, '');
@@ -111,7 +139,7 @@
                 }
             });
 
-            passwordInput.addEventListener('input', function() {
+            passwordInput.addEventListener('input', function () {
                 if (this.value.length === 0) {
                     toggleError(this, passwordError, '');
                 } else if (this.value.length < 6) {
@@ -121,7 +149,7 @@
                 }
             });
 
-            кform.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 let isValid = true;
 
                 const phoneDigits = phoneInput.value.replace(/\D/g, '');
@@ -137,7 +165,6 @@
 
                 if (!isValid) {
                     e.preventDefault();
-                } else {
                 }
             });
         });

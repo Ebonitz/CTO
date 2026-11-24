@@ -20,18 +20,37 @@ from moon import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('/history', views.history, name="history"),
-    path('/mastera', views.mastera, name="mastera"),
-    path('/vhod', views.vhod, name="vhod"),
-    path('/uslugi', views.uslugi, name="uslugi"),
-    path('/registracia', views.registracia, name="registracia"),
-    path('/profil', views.profil, name="profil"),
-    path('/moi_garaje', views.moi_garaje, name="moi_garaje"),
-    path('/moi_zapis', views.moi_zapis, name="moi_zapis"),
-    path('/oformlenie_zapisi', views.oformlenie_zapisi, name="oformlenie_zapisi"),
-    path('/vhod_sotr', views.vhod_sotr, name="vhod_sotr"),
-    path('/zapisi_mastera', views.zapisi_mastera, name="zapisi_mastera"),
-    path('/profil_sotr', views.profil_sotr, name="profil_sotr"),
+    
+    path("history/", views.history, name="history"),
+    path("vhod/", views.vhod, name="vhod"),
+    path("logout/", views.logout_view, name="logout"),
+    path("registracia/", views.registracia, name="registracia"),
+    path("profil/", views.profil, name="profil"),
+
+    path("moi_garaje/", views.moi_garaje, name="moi_garaje"),
+
+    path("uslugi/", views.uslugi, name="uslugi"),
+    path("uslugi/add/<int:service_id>/", views.add_to_cart, name="add_to_cart"),
+    path("uslugi/remove/<int:service_id>/", views.remove_from_cart, name="remove_from_cart"),
+    path("uslugi/clear/", views.clear_cart, name="clear_cart"),
+
+    path("mastera/", views.mastera, name="mastera"),
+
+    path("api/slots/", views.available_slots, name="available_slots"),
+
+    path("oformlenie_zapisi/", views.oformlenie_zapisi, name="oformlenie_zapisi"),
+
+    path("moi_zapis/", views.moi_zapis, name="moi_zapis"),
+    path("moi_zapis/cancel/<int:appointment_id>/", views.cancel_appointment, name="cancel_appointment"),
+
+    path("vhod_sotr/", views.vhod_sotr, name="vhod_sotr"),
+    path("zapisi_mastera/", views.zapisi_mastera, name="zapisi_mastera"),
+    path(
+        "zapisi_mastera/confirm/<int:appointment_id>/",
+        views.confirm_appointment,
+        name="confirm_appointment",
+    ),
+    path("profil_sotr/", views.profil_sotr, name="profil_sotr"),
     
     path('', views.main, name="main"),
 ]

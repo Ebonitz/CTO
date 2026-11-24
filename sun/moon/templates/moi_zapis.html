@@ -1,73 +1,78 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СТО — Автосервис</title>
+    <title>СТО — Мои записи</title>
     <link rel="stylesheet" href="{% static 'css/moi_garaje.css' %}">
 </head>
 <body>
 
 <header class="header">
     <input type="checkbox" id="burger" class="burger">
-
     <div class="container header__inner">
-
         <div class="header__brand">
             <a href="{% url 'main' %}" class="logo">
                 <img src="{% static 'img/logo.png' %}" alt="СТО">
             </a>
-
             <label for="burger" class="burger-toggle">
                 <svg width="28" height="16" viewBox="0 0 28 16">
-                    <path d="M2 2L14 14L26 2" stroke="#FF9900"
-                          stroke-width="4" fill="none"
-                          stroke-linecap="round"/>
+                    <path d="M2 2L14 14L26 2" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round"/>
                 </svg>
             </label>
         </div>
-
         <nav class="nav">
             <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
             <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
             <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
             <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
-            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
-            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
-            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+
+            {% if not user.is_authenticated %}
+                <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+                <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profil' %}" class="nav__link nav__link--mobile">Профиль</a>
+            {% endif %}
         </nav>
 
-        <div class="profile-wrapper">
-            <a href="#" class="profile">
-                <span class="profile__icon"></span>
-                <span>Профиль</span>
-            </a>
+        {% if user.is_authenticated %}
+            <div class="profile-wrapper">
+                <a href="#" class="profile">
+                    <span class="profile__icon"></span>
+                    <span>Профиль</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profil' %}" class="dropdown-item">
+                        <img src="{% static 'img/Vector.png' %}" alt=""> Профиль
+                    </a>
+                    <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                        <img src="{% static 'img/Group.png' %}" alt=""> Мой гараж
+                    </a>
+                    <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                        <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи
+                    </a>
 
-            <div class="profile-dropdown">
-                <a href="{% url 'profil' %}" class="dropdown-item">
-                    <img src="{% static 'img/Vector.png' %}" alt="">
-                    Профиль
-                </a>
-                <a href="{% url 'moi_garaje' %}" class="dropdown-item">
-                    <img src="{% static 'img/Group.png' %}" alt="">
-                    Мой гараж
-                </a>
-                <a href="{% url 'moi_zapis' %}" class="dropdown-item">
-                    <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt="">
-                    Мои записи
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'main' %}" class="dropdown-item logout">
-                    <img src="{% static 'img/Vector(1).png' %}" alt="">
-                    Выйти
-                </a>
+                    {% if user.is_superuser or user.master_profile %}
+                        <a href="{% url 'zapisi_mastera' %}" class="dropdown-item">
+                            <img src="{% static 'img/Group.png' %}" alt=""> Записи мастера
+                        </a>
+                    {% endif %}
+
+                    <div class="dropdown-divider"></div>
+
+                    <form action="{% url 'logout' %}" method="post" class="dropdown-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item logout">
+                            <img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-
+        {% endif %}
     </div>
-
     <label for="burger" class="nav-overlay"></label>
 </header>
 
@@ -75,50 +80,82 @@
     <section class="garage">
         <div class="container">
 
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="messages__item messages__item--{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="garage__header">
                 <a href="{% url 'profil' %}" class="garage__label"> -ЛИЧНЫЙ КАБИНЕТ</a>
                 <h1 class="garage__title">Мои записи</h1>
                 <span class="garage__count">Предстоящие визиты и история</span>
             </div>
 
-            <article class="car-card">
-                <div class="car-card__image">
-                    <img src="{% static 'img/Vector(3).png' %}" alt="Lada GRANTA">
+            {% for appointment in appointments %}
+                <article class="car-card" style="flex-wrap: wrap;">
+                    <div class="car-card__info" style="flex: 1 1 100%;">
+                        <h2 class="car-card__name">
+                            {{ appointment.date|date:"d.m.Y" }}
+                            · {{ appointment.time|time:"H:i" }}
+                            · {{ appointment.master.last_name }} {{ appointment.master.first_name }}
+                        </h2>
+                        <p class="car-card__mileage">
+                            Авто: {{ appointment.car.brand }} {{ appointment.car.model }}
+                            {% if appointment.car.plate %} ({{ appointment.car.plate }}){% endif %}
+                        </p>
+                        <p class="car-card__mileage">
+                            Услуги:
+                            {% for aps in appointment.services.all %}
+                                {{ aps.service.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p class="car-card__mileage">
+                            Стоимость: {{ appointment.total_cost }} руб
+                            · Длительность: {{ appointment.total_duration }} мин
+                        </p>
+                        <p class="car-card__mileage">
+                            Статус:
+                            <strong style="color: var(--orange);">
+                                {{ appointment.status.name }}
+                            </strong>
+                        </p>
+                    </div>
+
+                    {% if appointment.status.name != "Отменена" and appointment.status.name != "Выполнена" %}
+                        <form method="post" action="{% url 'cancel_appointment' appointment.id %}" style="margin-top: 12px;">
+                            {% csrf_token %}
+                            <button type="submit" class="car-card__edit"
+                                    onclick="return confirm('Отменить эту запись?');"
+                                    style="color: #e74c3c; border-color: #e74c3c;">
+                                Отменить запись
+                            </button>
+                        </form>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <div class="garage__empty">
+                    <img src="{% static 'img/repayment-date-svgrepo-com2.png' %}" alt="">
+                    <h2 class="garage__empty-title">Записей пока нет</h2>
+                    <p class="garage__empty-text">Запишитесь на свою процедуру</p>
+                    <a href="{% url 'uslugi' %}" class="btn btn--small">
+                        Записаться
+                    </a>
                 </div>
-
-                <div class="car-card__info">
-                    <h2 class="car-card__name">Двигатель  Стоимость: 5 000 руб</h2>
-                </div>
-
-            </article>
-
-            <div class="garage__empty">
-                <img src="{% static 'img/repayment-date-svgrepo-com2.png' %}" alt="">
-                </svg>
-
-                <h2 class="garage__empty-title">Записей пока нет</h2>
-                <p class="garage__empty-text">Запишитесь на свою процедуру</p>
-
-                <a href="{% url 'uslugi' %}"" class="btn btn--small">
-                    Записаться
-                </a>
-            </div>
+            {% endfor %}
 
         </div>
     </section>
 </main>
 
-
 <footer class="footer">
     <div class="container footer__inner">
-
         <div class="footer__column">
             <img src="{% static 'img/logo.png' %}" alt="СТО" class="footer__logo">
-            <p class="footer__description">
-                Платформа для онлайн-записи на ТО, удобно для водителей
-            </p>
+            <p class="footer__description">Платформа для онлайн-записи на ТО, удобно для водителей</p>
         </div>
-
         <div class="footer__column">
             <h3>Для клиентов</h3>
             <a href="{% url 'moi_garaje' %}">Мой гараж</a>
@@ -126,20 +163,17 @@
             <a href="{% url 'uslugi' %}">Записаться</a>
             <a href="{% url 'mastera' %}">Мастера</a>
         </div>
-
         <div class="footer__column">
             <h3>Для сотрудников</h3>
             <a href="#">Работа у нас</a>
             <a href="{% url 'vhod_sotr' %}">Вход как мастер</a>
         </div>
-
         <div class="footer__column">
             <h3>Контакты</h3>
             <a href="tel:+78005553535">+78005553535</a>
             <a href="mailto:support@sto.ru">support@sto.ru</a>
             <span>Ульяновск, Россия</span>
         </div>
-
     </div>
 </footer>
 

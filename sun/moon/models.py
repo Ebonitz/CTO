@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.conf import settings
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -18,28 +20,39 @@ class Profile(models.Model):
 
 
 class Car(models.Model):
-    client = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='cars', verbose_name="Владелец (клиент)"
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="cars",
+        blank=True,
+        null=True,
     )
     brand = models.CharField(max_length=100, verbose_name="Марка")
     model = models.CharField(max_length=100, verbose_name="Модель")
-    year = models.IntegerField(
-        verbose_name="Год выпуска", 
-        null=True, blank=True,
-        validators=[MinValueValidator(1900), MaxValueValidator(timezone.now().year)]
-    )
-    license_plate = models.CharField(max_length=20, verbose_name="Госномер", unique=True)
+    year = models.PositiveIntegerField(verbose_name="Год", blank=True, null=True)
+    mileage = models.PositiveIntegerField(verbose_name="Пробег", blank=True, null=True)
+    plate = models.CharField(max_length=20, verbose_name="Гос номер", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
+        ordering = ["-created_at"]
         verbose_name = "Автомобиль"
         verbose_name_plural = "Автомобили"
-        ordering = ['brand', 'model']
 
     def __str__(self):
-        return f"{self.brand} {self.model} ({self.license_plate})"
+        return f"{self.brand} {self.model} ({self.plate})"
 
 
 class Service(models.Model):
+    CATEGORY_CHOICES = [
+        ("engine", "Двигатель"),
+        ("transmission", "Трансмиссия"),
+        ("tires", "Шиномонтаж"),
+        ("diagnostics", "Диагностика"),
+        ("conditioner", "Заправка кондиционера"),
+    ]
+
     name = models.CharField(max_length=200, verbose_name="Название услуги", unique=True)
     description = models.TextField(verbose_name="Описание", blank=True, null=True)
     price = models.DecimalField(
@@ -47,8 +60,15 @@ class Service(models.Model):
         validators=[MinValueValidator(0)]
     )
     duration = models.IntegerField(
-        verbose_name="Длительность (мин)", 
+        verbose_name="Длительность (мин)",
         validators=[MinValueValidator(1)]
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Категория",
     )
 
     class Meta:
@@ -77,6 +97,14 @@ class Specialization(models.Model):
 
 
 class Master(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="master_profile",
+        verbose_name="Учётная запись",
+    )
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     last_name = models.CharField(max_length=100, verbose_name="Фамилия")
     phone = models.CharField(max_length=20, verbose_name="Телефон")
@@ -119,11 +147,14 @@ class Appointment(models.Model):
     date = models.DateField(verbose_name="Дата записи")
     time = models.TimeField(verbose_name="Время записи")
     total_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name="Итоговая стоимость"
+        max_digits=10, decimal_places=2, verbose_name="Итоговая стоимость",
+        default=0
     )
-    total_duration = models.IntegerField(verbose_name="Итоговая длительность (мин)")
+    total_duration = models.IntegerField(
+        verbose_name="Итоговая длительность (мин)", default=0
+    )
     status = models.ForeignKey(
-        AppointmentStatus, on_delete=models.PROTECT, related_name='appointments', 
+        AppointmentStatus, on_delete=models.PROTECT, related_name='appointments',
         verbose_name="Статус"
     )
 
@@ -131,10 +162,9 @@ class Appointment(models.Model):
         verbose_name = "Запись"
         verbose_name_plural = "Записи"
         ordering = ['-date', '-time']
-        # NFR-03: Запрет двойной записи к одному мастеру на одно время
         constraints = [
             models.UniqueConstraint(
-                fields=['master', 'date', 'time'], 
+                fields=['master', 'date', 'time'],
                 name='unique_master_appointment_time'
             )
         ]
@@ -144,7 +174,6 @@ class Appointment(models.Model):
 
 
 class AppointmentService(models.Model):
-    """Явная связующая таблица для связи M:M с собственными атрибутами (NFR-09)"""
     appointment = models.ForeignKey(
         Appointment, on_delete=models.CASCADE, related_name='services', verbose_name="Запись"
     )
@@ -161,7 +190,7 @@ class AppointmentService(models.Model):
         verbose_name_plural = "Услуги в записях"
         constraints = [
             models.UniqueConstraint(
-                fields=['appointment', 'service'], 
+                fields=['appointment', 'service'],
                 name='unique_service_per_appointment'
             )
         ]

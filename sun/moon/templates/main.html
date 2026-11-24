@@ -12,62 +12,68 @@
 
 <header class="header">
     <input type="checkbox" id="burger" class="burger">
-
     <div class="container header__inner">
-
         <div class="header__brand">
             <a href="{% url 'main' %}" class="logo">
                 <img src="{% static 'img/logo.png' %}" alt="СТО">
             </a>
-
             <label for="burger" class="burger-toggle">
                 <svg width="28" height="16" viewBox="0 0 28 16">
-                    <path d="M2 2L14 14L26 2" stroke="#FF9900"
-                          stroke-width="4" fill="none"
-                          stroke-linecap="round"/>
+                    <path d="M2 2L14 14L26 2" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round"/>
                 </svg>
             </label>
         </div>
-
         <nav class="nav">
             <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
             <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
             <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
             <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
-            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
-            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
-            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+
+            {% if not user.is_authenticated %}
+                <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+                <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profil' %}" class="nav__link nav__link--mobile">Профиль</a>
+            {% endif %}
         </nav>
 
-        <div class="profile-wrapper">
-            <a href="#" class="profile">
-                <span class="profile__icon"></span>
-                <span>Профиль</span>
-            </a>
+        {% if user.is_authenticated %}
+            <div class="profile-wrapper">
+                <a href="#" class="profile">
+                    <span class="profile__icon"></span>
+                    <span>Профиль</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profil' %}" class="dropdown-item">
+                        <img src="{% static 'img/Vector.png' %}" alt=""> Профиль
+                    </a>
+                    <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                        <img src="{% static 'img/Group.png' %}" alt=""> Мой гараж
+                    </a>
+                    <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                        <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи
+                    </a>
 
-            <div class="profile-dropdown">
-                <a href="{% url 'profil' %}" class="dropdown-item">
-                    <img src="{% static 'img/Vector.png' %}" alt="">
-                    Профиль
-                </a>
-                <a href="{% url 'moi_garaje' %}" class="dropdown-item">
-                    <img src="{% static 'img/Group.png' %}" alt="">
-                    Мой гараж
-                </a>
-                <a href="{% url 'moi_zapis' %}" class="dropdown-item">
-                    <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt="">
-                    Мои записи
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'main' %}" class="dropdown-item logout">
-                    <img src="{% static 'img/Vector(1).png' %}" alt="">
-                    Выйти
-                </a>
+                    {% if user.is_superuser or user.master_profile %}
+                        <a href="{% url 'zapisi_mastera' %}" class="dropdown-item">
+                            <img src="{% static 'img/Group.png' %}" alt=""> Записи мастера
+                        </a>
+                    {% endif %}
+
+                    <div class="dropdown-divider"></div>
+
+                    <form action="{% url 'logout' %}" method="post" class="dropdown-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item logout">
+                            <img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-
+        {% endif %}
     </div>
-
     <label for="burger" class="nav-overlay"></label>
 </header>
 

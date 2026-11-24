@@ -11,7 +11,6 @@
 
 <header class="header">
     <input type="checkbox" id="burger" class="burger">
-
     <div class="container header__inner">
         <div class="header__brand">
             <a href="{% url 'main' %}" class="logo">
@@ -23,30 +22,56 @@
                 </svg>
             </label>
         </div>
-
         <nav class="nav">
             <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
             <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
             <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
-            <a href="{% url 'mastera' %}" class="nav__link is-active">Мастера</a>
-            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
-            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
-            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+            <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
+
+            {% if not user.is_authenticated %}
+                <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+                <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profil' %}" class="nav__link nav__link--mobile">Профиль</a>
+            {% endif %}
         </nav>
 
-        <div class="profile-wrapper">
-            <a href="#" class="profile">
-                <span class="profile__icon"></span>
-                <span>Профиль</span>
-            </a>
-            <div class="profile-dropdown">
-                <a href="{% url 'profil' %}" class="dropdown-item"><img src="{% static 'img/Vector.png' %}" alt=""> Профиль</a>
-                <a href="{% url 'moi_garaje' %}" class="dropdown-item"><img src="{% static 'img/Group.png' %}" alt=""> Мой гараж</a>
-                <a href="{% url 'moi_zapis' %}" class="dropdown-item"><img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи</a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'main' %}" class="dropdown-item logout"><img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти</a>
+        {% if user.is_authenticated %}
+            <div class="profile-wrapper">
+                <a href="#" class="profile">
+                    <span class="profile__icon"></span>
+                    <span>Профиль</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profil' %}" class="dropdown-item">
+                        <img src="{% static 'img/Vector.png' %}" alt=""> Профиль
+                    </a>
+                    <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                        <img src="{% static 'img/Group.png' %}" alt=""> Мой гараж
+                    </a>
+                    <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                        <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи
+                    </a>
+
+                    {% if user.is_superuser or user.master_profile %}
+                        <a href="{% url 'zapisi_mastera' %}" class="dropdown-item">
+                            <img src="{% static 'img/Group.png' %}" alt=""> Записи мастера
+                        </a>
+                    {% endif %}
+
+                    <div class="dropdown-divider"></div>
+
+                    <form action="{% url 'logout' %}" method="post" class="dropdown-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item logout">
+                            <img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     <label for="burger" class="nav-overlay"></label>
 </header>
@@ -55,77 +80,42 @@
     <section class="garage masters-section">
         <div class="container">
 
-            <!-- Заголовок -->
             <div class="garage__header">
                 <a href="{% url 'uslugi' %}" class="garage__label"> -КАТАЛОГ УСЛУГ</a>
                 <h1 class="garage__title">Наши мастера</h1>
                 <span class="garage__count">Выберите того самого</span>
             </div>
 
-            <!-- Сетка мастеров -->
             <div class="masters-grid">
-                
-                <!-- Мастер 1 -->
-                <article class="master-card">
-                    <div class="master-card__top">
-                        <div class="master-card__avatar"></div>
-                        <div class="master-card__name">Пупкин Харитон<br>Утюгович</div>
-                    </div>
-                    <div class="master-card__info">
-                        <p><span class="text-muted">Специальность:</span> Электрик</p>
-                        <p><span class="text-muted">График:</span> пн-пт 9:00 - 17:00<br><span class="text-muted" style="visibility: hidden;">График:</span> сб-вс - выходной</p>
-                    </div>
-                    <a href="#" class="master-card__btn">Записаться</a>
-                </article>
-
-                <!-- Мастер 2 -->
-                <article class="master-card">
-                    <div class="master-card__top">
-                        <div class="master-card__avatar"></div>
-                        <div class="master-card__name">Викулина Мария<br>Васильевна</div>
-                    </div>
-                    <div class="master-card__info">
-                        <p><span class="text-muted">Специальность:</span> Электрик</p>
-                        <p><span class="text-muted">График:</span> пн-пт 9:00 - 17:00<br><span class="text-muted" style="visibility: hidden;">График:</span> сб-вс - выходной</p>
-                    </div>
-                    <a href="#" class="master-card__btn">Записаться</a>
-                </article>
-
-                <!-- Мастер 3 -->
-                <article class="master-card">
-                    <div class="master-card__top">
-                        <div class="master-card__avatar"></div>
-                        <div class="master-card__name">Пупкин Харитон<br>Утюгович</div>
-                    </div>
-                    <div class="master-card__info">
-                        <p><span class="text-muted">Специальность:</span> Электрик</p>
-                        <p><span class="text-muted">График:</span> пн-пт 9:00 - 17:00<br><span class="text-muted" style="visibility: hidden;">График:</span> сб-вс - выходной</p>
-                    </div>
-                    <a href="#" class="master-card__btn">Записаться</a>
-                </article>
-
-                <!-- Мастер 4 -->
-                <article class="master-card">
-                    <div class="master-card__top">
-                        <div class="master-card__avatar"></div>
-                        <div class="master-card__name">Пупкин Харитон<br>Утюгович</div>
-                    </div>
-                    <div class="master-card__info">
-                        <p><span class="text-muted">Специальность:</span> Электрик</p>
-                        <p><span class="text-muted">График:</span> пн-пт 9:00 - 17:00<br><span class="text-muted" style="visibility: hidden;">График:</span> сб-вс - выходной</p>
-                    </div>
-                    <a href="#" class="master-card__btn">Записаться</a>
-                </article>
-
-            </div>
-
-            <!-- Кнопка Показать еще -->
-            <div class="show-more-wrapper">
-                <button class="btn-show-more">
-                    Показать еще
-                    <!-- Иконка стрелки вниз. Замените на вашу картинку -->
-                    <img src="{% static 'img/arrow-down.png' %}" alt="" class="icon-small">
-                </button>
+                {% for master in masters %}
+                    <article class="master-card">
+                        <div class="master-card__top">
+                            <div class="master-card__avatar"></div>
+                            <div class="master-card__name">
+                                {{ master.last_name }}<br>{{ master.first_name }}
+                            </div>
+                        </div>
+                        <div class="master-card__info">
+                            <p>
+                                <span class="text-muted">Специальность:</span>
+                                {% for spec in master.specializations.all %}
+                                    {{ spec.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </p>
+                            <p>
+                                <span class="text-muted">График:</span>
+                                пн-пт 9:00 - 17:00<br>
+                                <span class="text-muted" style="visibility: hidden;">График:</span>
+                                сб-вс - выходной
+                            </p>
+                        </div>
+                        <a href="{% url 'oformlenie_zapisi' %}?master={{ master.id }}" class="master-card__btn">Записаться</a>
+                    </article>
+                {% empty %}
+                    <p>Мастеров пока нет.</p>
+                {% endfor %}
             </div>
 
         </div>

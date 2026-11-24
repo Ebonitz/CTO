@@ -172,6 +172,110 @@ img {
     color: var(--orange);
 }
 
+/* ===================================================== */
+/* Сообщения (успех / ошибка)                            */
+/* ===================================================== */
+
+.messages {
+    list-style: none;
+    margin: 0 0 2vh 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+.messages__item {
+    padding: 1.2vh 2vh;
+    border-radius: 10px;
+    font-size: 1.3vh;
+    border: 1px solid transparent;
+}
+
+.messages__item--success {
+    background: rgba(46, 204, 113, 0.12);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.messages__item--error {
+    background: rgba(231, 76, 60, 0.12);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.messages__item--warning {
+    background: rgba(255, 153, 0, 0.12);
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
+.messages__item--info {
+    background: rgba(52, 152, 219, 0.12);
+    border-color: #3498db;
+    color: #3498db;
+}
+
+/* ===================================================== */
+/* Пробег под названием авто                             */
+/* ===================================================== */
+
+.car-card__mileage {
+    display: block;
+    margin-top: 0.4vh;
+    font-size: 1.2vh;
+    color: var(--light-gray);
+}
+
+/* ===================================================== */
+/* Ошибки внутри модального окна                         */
+/* ===================================================== */
+
+.modal__error {
+    display: block;
+    margin-top: 0.4vh;
+    font-size: 1.2vh;
+    color: #e74c3c;
+}
+
+/* ===================================================== */
+/* Кнопка «Выйти» в выпадающем меню                      */
+/* ===================================================== */
+
+.dropdown-logout-form {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.dropdown-logout-form .dropdown-item {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 1.3vh;
+    cursor: pointer;
+    color: var(--orange);
+}
+
+.dropdown-logout-form .dropdown-item:hover {
+    background: rgba(255, 153, 0, 0.1);
+}
+
+.dropdown-logout-form .dropdown-item img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+@media (max-width: 480px) {
+    .messages__item {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+}
+
 .dropdown-item.logout:hover {
     background: rgba(255, 153, 0, 0.1);
 }
@@ -693,5 +797,82 @@ img {
         font-size: 14px;
         padding: 10px 20px;
         margin-top: 12px;
+    }
+}
+
+
+/* Сообщения (успех / ошибка) */
+.messages {
+    list-style: none;
+    margin: 0 0 2vh 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+.messages__item {
+    padding: 1.2vh 2vh;
+    border-radius: 10px;
+    font-size: 1.3vh;
+    border: 1px solid transparent;
+}
+
+.messages__item--success {
+    background: rgba(46, 204, 113, 0.12);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.messages__item--error {
+    background: rgba(231, 76, 60, 0.12);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.messages__item--warning {
+    background: rgba(255, 153, 0, 0.12);
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
+.messages__item--info {
+    background: rgba(52, 152, 219, 0.12);
+    border-color: #3498db;
+    color: #3498db;
+}
+
+/* Кнопка «Выйти» в дропдауне */
+.dropdown-logout-form {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.dropdown-logout-form .dropdown-item {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 1.3vh;
+    cursor: pointer;
+    color: var(--orange);
+}
+
+.dropdown-logout-form .dropdown-item:hover {
+    background: rgba(255, 153, 0, 0.1);
+}
+
+.dropdown-logout-form .dropdown-item img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+@media (max-width: 480px) {
+    .messages__item {
+        font-size: 13px;
+        padding: 10px 14px;
     }
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>СТО — Каталог услуг</title>
-    
+
     <link rel="stylesheet" href="{% static 'css/uslugi.css' %}">
 </head>
 <body>
@@ -26,25 +26,53 @@
         <nav class="nav">
             <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
             <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
-            <a href="{% url 'uslugi' %}" class="nav__link is-active">Каталог</a>
+            <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
             <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
-            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
-            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
-            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+
+            {% if not user.is_authenticated %}
+                <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+                <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profil' %}" class="nav__link nav__link--mobile">Профиль</a>
+            {% endif %}
         </nav>
-        <div class="profile-wrapper">
-            <a href="#" class="profile">
-                <span class="profile__icon"></span>
-                <span>Профиль</span>
-            </a>
-            <div class="profile-dropdown">
-                <a href="{% url 'profil' %}" class="dropdown-item"><img src="{% static 'img/Vector.png' %}" alt=""> Профиль</a>
-                <a href="{% url 'moi_garaje' %}" class="dropdown-item"><img src="{% static 'img/Group.png' %}" alt=""> Мой гараж</a>
-                <a href="{% url 'moi_zapis' %}" class="dropdown-item"><img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи</a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'main' %}" class="dropdown-item logout"><img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти</a>
+
+        {% if user.is_authenticated %}
+            <div class="profile-wrapper">
+                <a href="#" class="profile">
+                    <span class="profile__icon"></span>
+                    <span>Профиль</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profil' %}" class="dropdown-item">
+                        <img src="{% static 'img/Vector.png' %}" alt=""> Профиль
+                    </a>
+                    <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                        <img src="{% static 'img/Group.png' %}" alt=""> Мой гараж
+                    </a>
+                    <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                        <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи
+                    </a>
+
+                    {% if user.is_superuser or user.master_profile %}
+                        <a href="{% url 'zapisi_mastera' %}" class="dropdown-item">
+                            <img src="{% static 'img/Group.png' %}" alt=""> Записи мастера
+                        </a>
+                    {% endif %}
+
+                    <div class="dropdown-divider"></div>
+
+                    <form action="{% url 'logout' %}" method="post" class="dropdown-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item logout">
+                            <img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     <label for="burger" class="nav-overlay"></label>
 </header>
@@ -53,109 +81,126 @@
     <section class="garage catalog-section">
         <div class="container">
 
-           
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="messages__item messages__item--{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="garage__header">
-               <a href="{% url 'moi_zapis' %}" class="garage__label"> -МОИ ЗАПИСИ</a>
+                <a href="{% url 'moi_zapis' %}" class="garage__label"> -МОИ ЗАПИСИ</a>
                 <h1 class="garage__title">Каталог услуг</h1>
                 <span class="garage__count">Поиск по услуге, записи</span>
             </div>
 
-           
-            <div class="search-bar">
-                <input type="text" placeholder="Например: замена масла, диагностика" class="search-bar__input">
-                <button class="search-bar__btn">
-                    
+            <!-- Поиск -->
+            <form class="search-bar" method="get" action="{% url 'uslugi' %}">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Например: замена масла, диагностика"
+                    class="search-bar__input"
+                >
+                {% for cat in selected_categories %}
+                    <input type="hidden" name="category" value="{{ cat }}">
+                {% endfor %}
+                <button type="submit" class="search-bar__btn" aria-label="Поиск">
                     <img src="{% static 'img/search.png' %}" alt="Поиск">
                 </button>
-            </div>
+            </form>
 
-           
             <div class="catalog-subtitle">
                 <h2>Подходящая помощь</h2>
                 <p>Проверенные данные, актуальные графики и онлайн запись</p>
             </div>
 
-            
             <div class="catalog-layout">
-                
-               
-                <aside class="catalog-filters">
+
+                <!-- Фильтры -->
+                <form class="catalog-filters" method="get" id="filterForm" action="{% url 'uslugi' %}">
+                    <input type="hidden" name="q" value="{{ query }}">
                     <div class="filter-card">
                         <h3 class="filter-card__title">Фильтры</h3>
-                        
+
                         <div class="filter-group">
-                            <label class="filter-label">
-                                <input type="checkbox" class="filter-checkbox">
-                                <span>Двигатель</span>
-                            </label>
-                            <label class="filter-label">
-                                <input type="checkbox" class="filter-checkbox">
-                                <span>Трансмиссия</span>
-                            </label>
-                            <label class="filter-label">
-                                <input type="checkbox" class="filter-checkbox">
-                                <span>Шиномонтаж</span>
-                            </label>
-                            <label class="filter-label">
-                                <input type="checkbox" class="filter-checkbox">
-                                <span>Диагностика</span>
-                            </label>
-                            <label class="filter-label">
-                                <input type="checkbox" class="filter-checkbox">
-                                <span>Заправка кондиционера</span>
-                            </label>
+                            {% for value, label in category_choices %}
+                                <label class="filter-label">
+                                    <input
+                                        type="checkbox"
+                                        name="category"
+                                        value="{{ value }}"
+                                        class="filter-checkbox"
+                                        {% if value in selected_categories %}checked{% endif %}
+                                        onchange="document.getElementById('filterForm').submit();"
+                                    >
+                                    <span>{{ label }}</span>
+                                </label>
+                            {% endfor %}
                         </div>
 
-                        <a href="{% url 'oformlenie_zapisi' %}" class="btn-filter-submit">Записаться</a>
-                    </div>
-                </aside>
-
-                
-                <div class="catalog-content">
-                    
-                    <div class="service-list">
-                
-                        <label class="service-card">
-                            <div class="service-card__left">
-                                <input type="checkbox" class="service-checkbox" checked>
-                                <span class="service-card__name">Трансмиссия</span>
-                            </div>
-                            <div class="service-card__right">
-                                <span class="service-card__time">45 мин <img src="{% static 'img/Vector(2).png' %}" alt="" class="icon-small"></span>
-                                <span class="service-card__price">3 000 руб</span>
-                            </div>
-                        </label>
-
-                        
-                        <label class="service-card">
-                            <div class="service-card__left">
-                                <input type="checkbox" class="service-checkbox" checked>
-                                <span class="service-card__name">Замена масла</span>
-                            </div>
-                            <div class="service-card__right">
-                                <span class="service-card__time">40 мин <img src="{% static 'img/Vector(2).png' %}" alt="" class="icon-small"></span>
-                                <span class="service-card__price">2 000 руб</span>
-                            </div>
-                        </label>
-                    </div>
-
-                   
-                    <div class="service-empty">
-                        
-                        <img src="{% static 'img/Vector(3).png' %}" alt="" class="service-empty__icon">
-                        <p>Ничего не найдено</p>
-                    </div>
-
-                    
-                    <div class="show-more-wrapper">
-                        <button class="btn-show-more">
-                            Показать еще
-                            
-                            <img src="{% static 'img/arrow-down.png' %}" alt="" class="icon-small">
+                        <button type="submit" form="servicesForm" class="btn-filter-submit">
+                            Записаться
                         </button>
                     </div>
+                </form>
 
+                <!-- Список услуг -->
+                <div class="catalog-content">
+                    <form method="post" action="{% url 'uslugi' %}" id="servicesForm">
+                        {% csrf_token %}
+
+                        <div class="service-list">
+                            {% for service in services %}
+                                <label class="service-card">
+                                    <div class="service-card__left">
+                                        <input
+                                            type="checkbox"
+                                            name="service"
+                                            value="{{ service.id }}"
+                                            class="service-checkbox"
+                                            {% if service.id in cart_ids %}checked{% endif %}
+                                        >
+                                        <span class="service-card__name">{{ service.name }}</span>
+                                    </div>
+                                    <div class="service-card__right">
+                                        <span class="service-card__time">
+                                            {{ service.duration }} мин
+                                            <img src="{% static 'img/Vector(2).png' %}" alt="" class="icon-small">
+                                        </span>
+                                        <span class="service-card__price">{{ service.price }} руб</span>
+                                    </div>
+                                </label>
+                            {% empty %}
+                                <div class="service-empty">
+                                    <img src="{% static 'img/Vector(3).png' %}" alt="" class="service-empty__icon">
+                                    <p>Ничего не найдено</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if services %}
+                            <div class="show-more-wrapper">
+                                <button type="submit" class="btn-show-more">
+                                    Записаться
+                                    <img src="{% static 'img/arrow-down.png' %}" alt="" class="icon-small">
+                                </button>
+                            </div>
+                        {% endif %}
+                    </form>
+
+                    {% if cart_services %}
+                        <div class="filter-card" style="margin-top: 24px;">
+                            <h3 class="filter-card__title">В корзине</h3>
+                            <p style="margin-bottom: 8px;">{{ cart_services|length }} услуг</p>
+                            <p style="margin-bottom: 8px;">Итого: {{ total_cost }} руб</p>
+                            <p style="margin-bottom: 8px;">Длительность: {{ duration_display }}</p>
+                        </div>
+                    {% endif %}
                 </div>
+
             </div>
 
         </div>

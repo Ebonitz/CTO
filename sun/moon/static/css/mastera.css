@@ -33,6 +33,34 @@ img {
     max-width: 100%;
 }
 
+
+.dropdown-logout-form {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.dropdown-logout-form .dropdown-item {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 1.3vh;
+    cursor: pointer;
+    color: var(--orange);
+}
+
+.dropdown-logout-form .dropdown-item:hover {
+    background: rgba(255, 153, 0, 0.1);
+}
+
+.dropdown-logout-form .dropdown-item img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
 .container {
     width: var(--container);
     max-width: var(--max-width);

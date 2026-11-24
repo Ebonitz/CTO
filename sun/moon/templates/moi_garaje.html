@@ -1,73 +1,78 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СТО — Автосервис</title>
+    <title>СТО — Мой гараж</title>
     <link rel="stylesheet" href="{% static 'css/moi_garaje.css' %}">
 </head>
 <body>
 
 <header class="header">
     <input type="checkbox" id="burger" class="burger">
-
     <div class="container header__inner">
-
         <div class="header__brand">
             <a href="{% url 'main' %}" class="logo">
                 <img src="{% static 'img/logo.png' %}" alt="СТО">
             </a>
-
             <label for="burger" class="burger-toggle">
                 <svg width="28" height="16" viewBox="0 0 28 16">
-                    <path d="M2 2L14 14L26 2" stroke="#FF9900"
-                          stroke-width="4" fill="none"
-                          stroke-linecap="round"/>
+                    <path d="M2 2L14 14L26 2" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round"/>
                 </svg>
             </label>
         </div>
-
         <nav class="nav">
             <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
             <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
             <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
             <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
-            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
-            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
-            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+
+            {% if not user.is_authenticated %}
+                <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+                <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profil' %}" class="nav__link nav__link--mobile">Профиль</a>
+            {% endif %}
         </nav>
 
-        <div class="profile-wrapper">
-            <a href="#" class="profile">
-                <span class="profile__icon"></span>
-                <span>Профиль</span>
-            </a>
+        {% if user.is_authenticated %}
+            <div class="profile-wrapper">
+                <a href="#" class="profile">
+                    <span class="profile__icon"></span>
+                    <span>Профиль</span>
+                </a>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profil' %}" class="dropdown-item">
+                        <img src="{% static 'img/Vector.png' %}" alt=""> Профиль
+                    </a>
+                    <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                        <img src="{% static 'img/Group.png' %}" alt=""> Мой гараж
+                    </a>
+                    <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                        <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи
+                    </a>
 
-            <div class="profile-dropdown">
-                <a href="{% url 'profil' %}" class="dropdown-item">
-                    <img src="{% static 'img/Vector.png' %}" alt="">
-                    Профиль
-                </a>
-                <a href="{% url 'moi_garaje' %}" class="dropdown-item">
-                    <img src="{% static 'img/Group.png' %}" alt="">
-                    Мой гараж
-                </a>
-                <a href="{% url 'moi_zapis' %}" class="dropdown-item">
-                    <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt="">
-                    Мои записи
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'main' %}" class="dropdown-item logout">
-                    <img src="{% static 'img/Vector(1).png' %}" alt="">
-                    Выйти
-                </a>
+                    {% if user.is_superuser or user.master_profile %}
+                        <a href="{% url 'zapisi_mastera' %}" class="dropdown-item">
+                            <img src="{% static 'img/Group.png' %}" alt=""> Записи мастера
+                        </a>
+                    {% endif %}
+
+                    <div class="dropdown-divider"></div>
+
+                    <form action="{% url 'logout' %}" method="post" class="dropdown-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item logout">
+                            <img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-
+        {% endif %}
     </div>
-
     <label for="burger" class="nav-overlay"></label>
 </header>
 
@@ -75,42 +80,58 @@
     <section class="garage">
         <div class="container">
 
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="messages__item messages__item--{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="garage__header">
                 <a href="{% url 'profil' %}" class="garage__label"> -Личный кабинет</a>
                 <h1 class="garage__title">Мой гараж</h1>
-                <span class="garage__count">0 авто</span>
+                <span class="garage__count">{{ cars|length }} авто</span>
             </div>
 
-            <!-- Карточка авто (пример) -->
-            <article class="car-card">
-                <div class="car-card__image">
-                    <img src="{% static 'img/Group.png' %}" alt="Lada GRANTA">
+            {% if cars %}
+                {% for car in cars %}
+                    <article class="car-card"
+                             data-car-id="{{ car.id }}"
+                             data-car-brand="{{ car.brand }}"
+                             data-car-model="{{ car.model }}"
+                             data-car-year="{{ car.year }}"
+                             data-car-mileage="{{ car.mileage }}"
+                             data-car-plate="{{ car.plate }}">
+                        <div class="car-card__image">
+                            <img src="{% static 'img/Group.png' %}" alt="{{ car.brand }} {{ car.model }}">
+                        </div>
+
+                        <div class="car-card__info">
+                            <h2 class="car-card__name">
+                                {{ car.brand }} {{ car.model }} {{ car.year }} {{ car.plate }}
+                            </h2>
+                            <span class="car-card__mileage">{{ car.mileage }} км</span>
+                        </div>
+
+                        <button type="button" class="car-card__edit">Изменить</button>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <div class="garage__empty">
+                    <img src="{% static 'img/Group.png' %}" alt="" class="garage__empty-icon">
+                    <h2 class="garage__empty-title">Гараж пуст</h2>
+                    <p class="garage__empty-text">Добавьте свой автомобиль</p>
                 </div>
+            {% endif %}
 
-                <div class="car-card__info">
-                    <h2 class="car-card__name">Lada GRANTA 2019 T879TP</h2>
-                </div>
-
-                <button type="button" class="car-card__edit">Изменить</button>
-            </article>
-
-            <!-- Пустое состояние -->
-            <div class="garage__empty">
-                <img src="{% static 'img/Group.png' %}" alt="">
-                </svg>
-
-                <h2 class="garage__empty-title">Гараж пуст</h2>
-                <p class="garage__empty-text">Добавьте свой автомобиль</p>
-
-                <a href="#" class="btn btn--small">
-                    + Добавить автомобиль
-                </a>
-            </div>
+            <a href="#" class="btn btn--small" id="addCarBtn">
+                + Добавить автомобиль
+            </a>
 
         </div>
     </section>
 </main>
-
 
 <footer class="footer">
     <div class="container footer__inner">
@@ -146,43 +167,65 @@
     </div>
 </footer>
 
-
 <!-- МОДАЛЬНОЕ ОКНО -->
 <div class="modal-overlay" id="carModal">
     <div class="modal">
-        <h2 class="modal__title">Добавить авто</h2>
+        <h2 class="modal__title" id="modalTitle">Добавить авто</h2>
 
-        <form class="modal__form" action="#" method="POST">
+        <form class="modal__form" action="{% url 'moi_garaje' %}" method="POST" id="carForm">
             {% csrf_token %}
+            <input type="hidden" name="car_id" id="carId" value="">
 
             <div class="modal__grid">
                 <div class="modal__field">
-                    <label>Марка</label>
-                    <input type="text" name="brand" placeholder="Lada" value="Lada">
+                    <label for="id_brand">Марка</label>
+                    <input type="text" name="brand" id="id_brand" placeholder="Lada"
+                           value="{% if form %}{{ form.brand.value|default_if_none:'' }}{% endif %}" required>
+                    {% if form and form.brand.errors %}
+                        <span class="modal__error">{{ form.brand.errors|striptags }}</span>
+                    {% endif %}
                 </div>
 
                 <div class="modal__field">
-                    <label>Модель</label>
-                    <input type="text" name="model" placeholder="GRANTA" value="GRANTA">
+                    <label for="id_model">Модель</label>
+                    <input type="text" name="model" id="id_model" placeholder="GRANTA"
+                           value="{% if form %}{{ form.model.value|default_if_none:'' }}{% endif %}" required>
+                    {% if form and form.model.errors %}
+                        <span class="modal__error">{{ form.model.errors|striptags }}</span>
+                    {% endif %}
                 </div>
 
                 <div class="modal__field">
-                    <label>Год</label>
-                    <input type="text" name="year" placeholder="2019" value="2019">
+                    <label for="id_year">Год</label>
+                    <input type="number" name="year" id="id_year" placeholder="2019"
+                           min="1900" max="2100"
+                           value="{% if form %}{{ form.year.value|default_if_none:'' }}{% endif %}" required>
+                    {% if form and form.year.errors %}
+                        <span class="modal__error">{{ form.year.errors|striptags }}</span>
+                    {% endif %}
                 </div>
 
                 <div class="modal__field">
-                    <label>Пробег</label>
-                    <input type="text" name="mileage" placeholder="180678" value="180678">
+                    <label for="id_mileage">Пробег</label>
+                    <input type="number" name="mileage" id="id_mileage" placeholder="180678"
+                           min="0"
+                           value="{% if form %}{{ form.mileage.value|default_if_none:'' }}{% endif %}" required>
+                    {% if form and form.mileage.errors %}
+                        <span class="modal__error">{{ form.mileage.errors|striptags }}</span>
+                    {% endif %}
                 </div>
             </div>
 
             <div class="modal__field modal__field--full">
-                <label>Гос номер</label>
-                <input type="text" name="plate" placeholder="T879TP" value="T879TP">
+                <label for="id_plate">Гос номер</label>
+                <input type="text" name="plate" id="id_plate" placeholder="T879TP"
+                       value="{% if form %}{{ form.plate.value|default_if_none:'' }}{% endif %}" required>
+                {% if form and form.plate.errors %}
+                    <span class="modal__error">{{ form.plate.errors|striptags }}</span>
+                {% endif %}
             </div>
 
-            <button type="submit" class="btn--submit">Добавить</button>
+            <button type="submit" class="btn--submit" id="modalSubmit">Добавить</button>
         </form>
     </div>
 </div>
@@ -190,13 +233,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('carModal');
-    const editBtn = document.querySelector('.car-card__edit');
-    const addBtn = document.querySelector('.garage__empty .btn--small');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSubmit = document.getElementById('modalSubmit');
+    const carIdInput = document.getElementById('carId');
+    const form = document.getElementById('carForm');
+    const addBtn = document.getElementById('addCarBtn');
 
-    if (!modal) return;
+    if (!modal || !form) return;
 
-    function openModal(e) {
-        if (e) e.preventDefault();
+    function openModal() {
         modal.classList.add('is-active');
     }
 
@@ -204,8 +249,56 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.classList.remove('is-active');
     }
 
-    if (editBtn) editBtn.addEventListener('click', openModal);
-    if (addBtn) addBtn.addEventListener('click', openModal);
+    function resetForm() {
+        carIdInput.value = '';
+        document.getElementById('id_brand').value = '';
+        document.getElementById('id_model').value = '';
+        document.getElementById('id_year').value = '';
+        document.getElementById('id_mileage').value = '';
+        document.getElementById('id_plate').value = '';
+        modalTitle.textContent = 'Добавить авто';
+        modalSubmit.textContent = 'Добавить';
+    }
+
+    function fillForm(data) {
+        carIdInput.value = data.id || '';
+        document.getElementById('id_brand').value = data.brand || '';
+        document.getElementById('id_model').value = data.model || '';
+        document.getElementById('id_year').value = data.year || '';
+        document.getElementById('id_mileage').value = data.mileage || '';
+        document.getElementById('id_plate').value = data.plate || '';
+
+        if (data.id) {
+            modalTitle.textContent = 'Изменить авто';
+            modalSubmit.textContent = 'Сохранить';
+        } else {
+            modalTitle.textContent = 'Добавить авто';
+            modalSubmit.textContent = 'Добавить';
+        }
+    }
+
+    if (addBtn) {
+        addBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            resetForm();
+            openModal();
+        });
+    }
+
+    document.querySelectorAll('.car-card__edit').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.car-card');
+            fillForm({
+                id: card.dataset.carId,
+                brand: card.dataset.carBrand,
+                model: card.dataset.carModel,
+                year: card.dataset.carYear,
+                mileage: card.dataset.carMileage,
+                plate: card.dataset.carPlate,
+            });
+            openModal();
+        });
+    });
 
     modal.addEventListener('click', function (e) {
         if (e.target === modal) closeModal();
@@ -214,6 +307,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeModal();
     });
+
+    {% if open_modal %}
+        openModal();
+    {% endif %}
 });
 </script>
 </body>
