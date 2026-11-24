@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СТО — Оформление записи</title>
+    <link rel="stylesheet" href="{% static 'css/oformlenie_zapisi.css' %}">
+</head>
+<body>
+
+<header class="header">
+    <input type="checkbox" id="burger" class="burger">
+    <div class="container header__inner">
+        <div class="header__brand">
+            <a href="{% url 'main' %}" class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="СТО">
+            </a>
+            <label for="burger" class="burger-toggle">
+                <svg width="28" height="16" viewBox="0 0 28 16">
+                    <path d="M2 2L14 14L26 2" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </svg>
+            </label>
+        </div>
+        <nav class="nav">
+            <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
+            <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
+            <a href="{% url 'uslugi' %}" class="nav__link is-active">Каталог</a>
+            <a href="{% url 'mastera' %}" class="nav__link">Мастера</a>
+            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+        </nav>
+        <div class="profile-wrapper">
+            <a href="#" class="profile">
+                <span class="profile__icon"></span>
+                <span>Профиль</span>
+            </a>
+            <div class="profile-dropdown">
+                <a href="{% url 'profil' %}" class="dropdown-item"><img src="{% static 'img/Vector.png' %}" alt=""> Профиль</a>
+                <a href="{% url 'moi_garaje' %}" class="dropdown-item"><img src="{% static 'img/Group.png' %}" alt=""> Мой гараж</a>
+                <a href="{% url 'moi_zapis' %}" class="dropdown-item"><img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt=""> Мои записи</a>
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'main' %}" class="dropdown-item logout"><img src="{% static 'img/Vector(1).png' %}" alt=""> Выйти</a>
+            </div>
+        </div>
+    </div>
+    <label for="burger" class="nav-overlay"></label>
+</header>
+
+<main>
+    <section class="garage checkout-section">
+        <div class="container">
+
+           
+            <div class="garage__header">
+                <a href="{% url 'uslugi' %}" class="garage__label"> -КАТАЛОГ УСЛУГ</a>
+                <h1 class="garage__title">Оформление записи</h1>
+                <span class="garage__count">Проверка заказа</span>
+            </div>
+
+            <div class="checkout-layout">
+                
+                
+                <div class="checkout-form-col">
+                    
+                    
+                    <div class="checkout-block">
+                        <h2 class="checkout-block__title">Выбранные услуги:</h2>
+                        
+                        <div class="checkout-services">
+                            
+                            <div class="checkout-service-card">
+                                <span class="checkout-service-card__name">Трансмиссия</span>
+                                <div class="checkout-service-card__details">
+                                    <span>45 мин <img src="{% static 'img/clock-icon.png' %}" alt="" class="icon-small"></span>
+                                    <span>3 000 руб</span>
+                                </div>
+                            </div>
+                            
+                           
+                            <div class="checkout-service-card">
+                                <span class="checkout-service-card__name">Замена масла</span>
+                                <div class="checkout-service-card__details">
+                                    <span>40 мин <img src="{% static 'img/clock-icon.png' %}" alt="" class="icon-small"></span>
+                                    <span>2 000 руб</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="checkout-block">
+                        <h2 class="checkout-block__title">Выберите мастера:</h2>
+                        <div class="checkout-select-wrapper">
+                            <select class="checkout-select">
+                                <option value="" disabled selected>Пупкин Х.У.</option>
+                                <option value="1">Иванов И.И.</option>
+                                <option value="2">Сидоров А.П.</option>
+                            </select>
+                            <img src="{% static 'img/Vector13.png' %}" alt="" class="select-icon-right">
+                            
+                        </div>
+                    </div>
+
+                    
+                    <div class="checkout-block">
+                        <h2 class="checkout-block__title">Мой автомобиль:</h2>
+                        <div class="checkout-select-wrapper">
+                            <select class="checkout-select">
+                                <option value="" disabled selected>Lada GRANTA 2019 T879TP</option>
+                                <option value="1">Lada Vesta 2021 A123BC</option>
+                            </select>
+                            <img src="{% static 'img/arrow-down.png' %}" alt="" class="select-icon-right">
+                        </div>
+                    </div>
+
+                    
+                    <div class="checkout-block">
+                        <h2 class="checkout-block__title">Выберите дату:</h2>
+                        <div class="checkout-input-wrapper">
+                            <input type="text" class="checkout-input" placeholder="Дата записи (ДД-ММ-ГГГГ)" onfocus="(this.type='date')" onblur="(this.type='text')">
+                            <img src="{% static 'img/calendar-lines.png' %}" alt="" class="input-icon-right">
+                        </div>
+                    </div>
+
+            
+                    <div class="checkout-block">
+                        <h2 class="checkout-block__title">Выберите время:</h2>
+                        <div class="checkout-select-wrapper">
+                            <select class="checkout-select">
+                                <option value="" disabled selected>Время записи</option>
+                                <option value="1">09:00 - 11:00</option>
+                                <option value="2">11:00 - 13:00</option>
+                                <option value="3">13:00 - 15:00</option>
+                                <option value="4">15:00 - 17:00</option>
+
+                            </select>
+                            <img src="{% static 'img/cloc.png' %}" alt="" class="select-icon-right">
+                        </div>
+                    </div>
+
+                </div>
+
+                
+                <div class="checkout-summary-col">
+                    <div class="summary-card">
+                        <h2 class="summary-card__title">Ваш заказ:</h2>
+                        
+                        <div class="summary-list">
+                            <div class="summary-item">
+                                <span>Трансмиссия</span>
+                                <span>3 000 руб</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Замена масла</span>
+                                <span>2 000 руб</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-divider"></div>
+
+                        <div class="summary-total">
+                            <span>Итого:</span>
+                            <span>5 000 руб</span>
+                        </div>
+
+                        <div class="summary-duration">
+                            <img src="{% static 'img/clock-icon.png' %}" alt="" class="icon-small">
+                            <span>Длительность:</span>
+                            <span class="summary-duration__value">1 ч 25 мин</span>
+                        </div>
+
+                        <button class="btn-confirm">Подтвердить запись</button>
+
+                        <a href="{% url 'uslugi' %}" class="summary-back">
+                            <img src="{% static 'img/arrow-left.png' %}" alt="" class="icon-small">
+                            Назад к услугам
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container footer__inner">
+        <div class="footer__column">
+            <img src="{% static 'img/logo.png' %}" alt="СТО" class="footer__logo">
+            <p class="footer__description">Платформа для онлайн-записи на ТО, удобно для водителей</p>
+        </div>
+        <div class="footer__column">
+            <h3>Для клиентов</h3>
+            <a href="{% url 'moi_garaje' %}">Мой гараж</a>
+            <a href="{% url 'moi_zapis' %}">Мои записи</a>
+            <a href="{% url 'uslugi' %}">Записаться</a>
+            <a href="{% url 'mastera' %}">Мастера</a>
+        </div>
+        <div class="footer__column">
+            <h3>Для сотрудников</h3>
+            <a href="#">Работа у нас</a>
+            <a href="{% url 'vhod_sotr' %}">Вход как мастер</a>
+        </div>
+        <div class="footer__column">
+            <h3>Контакты</h3>
+            <a href="tel:+78005553535">+78005553535</a>
+            <a href="mailto:support@sto.ru">support@sto.ru</a>
+            <span>Ульяновск, Россия</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

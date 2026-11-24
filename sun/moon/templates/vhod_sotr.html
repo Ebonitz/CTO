@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СТО — Вход</title>
+    <link rel="stylesheet" href="{% static 'css/vhod.css' %}">
+</head>
+
+<body class="auth-page">
+
+    <header class="auth-header">
+        <a href="{% url 'main' %}" class="auth-logo">
+            <img src="{% static 'img/logo.png' %}" alt="СТО">
+        </a>
+    </header>
+
+    <main class="auth-main">
+        <div class="container auth-container">
+
+            <div class="auth-info">
+                <h1 class="auth-title">С возвращением!</h1>
+
+                <p class="auth-desc">
+                    Запись на ТО, история<br>
+                    обслуживания и цифровой гараж —<br>
+                    всё в одном месте.
+                </p>
+            </div>
+
+            <div class="auth-form-wrapper">
+                <div class="auth-form__inner">
+                    <h2 class="auth-form__title">Вход</h2>
+                    <p class="auth-form__subtitle">Рады видеть вас снова</p>
+
+                    <!-- Добавлен novalidate, чтобы работала наша JS-валидация -->
+                    <form class="auth-form" action="#" method="POST" id="loginForm" novalidate>
+                        {% csrf_token %}
+
+                        <div class="auth-field">
+                            <label for="phone">Номер телефона</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="+7 (999) 123-45-67"
+                                required
+                                pattern="\+7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}"
+                            >
+                            <span class="auth-error" id="phoneError"></span>
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="password">Пароль</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Введите пароль"
+                                required
+                                minlength="6"
+                            >
+                            <span class="auth-error" id="passwordError"></span>
+                        </div>
+
+                        <div class="auth-actions">
+
+
+                            <button type="submit" class="btn-auth-submit">
+                                Войти
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const phoneInput = document.getElementById('phone');
+            const passwordInput = document.getElementById('password');
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Функция для вывода/скрытия ошибки
+            function toggleError(input, errorElement, message) {
+                if (message) {
+                    input.classList.add('input-error');
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                } else {
+                    input.classList.remove('input-error');
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            }
+
+            // Валидация телефона (разрешаем ввод цифр, пробелов, +, (, ), -)
+            phoneInput.addEventListener('input', function() {
+                const value = this.value.replace(/\D/g, ''); // Оставляем только цифры для проверки длины
+                if (this.value.length === 0) {
+                    toggleError(this, phoneError, '');
+                } else if (value.length < 11) {
+                    toggleError(this, phoneError, 'Номер должен содержать 11 цифр');
+                } else {
+                    toggleError(this, phoneError, '');
+                }
+            });
+
+            // Валидация пароля
+            passwordInput.addEventListener('input', function() {
+                if (this.value.length === 0) {
+                    toggleError(this, passwordError, '');
+                } else if (this.value.length < 6) {
+                    toggleError(this, passwordError, 'Пароль должен быть не менее 6 символов');
+                } else {
+                    toggleError(this, passwordError, '');
+                }
+            });
+
+            // Проверка при отправке
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Проверка телефона (упрощенная, по количеству цифр)
+                const phoneDigits = phoneInput.value.replace(/\D/g, '');
+                if (phoneDigits.length < 11) {
+                    toggleError(phoneInput, phoneError, 'Введите корректный номер телефона');
+                    isValid = false;
+                }
+
+                // Проверка пароля
+                if (passwordInput.value.length < 6) {
+                    toggleError(passwordInput, passwordError, 'Пароль должен быть не менее 6 символов');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault(); // Останавливаем отправку формы
+                } else {
+                    // Здесь можно оставить отправку или сделать AJAX запрос
+                    // alert('Форма отправлена!'); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>

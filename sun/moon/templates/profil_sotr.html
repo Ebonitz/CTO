@@ -1,0 +1,366 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СТО — Профиль</title>
+    <link rel="stylesheet" href="{% static 'css/profil.css' %}">
+</head>
+<body>
+
+<header class="header">
+    <input type="checkbox" id="burger" class="burger">
+
+    <div class="container header__inner">
+        <div class="header__brand">
+            <a href="{% url 'main' %}" class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="СТО">
+            </a>
+
+            <label for="burger" class="burger-toggle">
+                <svg width="28" height="16" viewBox="0 0 28 16">
+                    <path d="M2 2L14 14L26 2"
+                          stroke="#FF9900"
+                          stroke-width="4"
+                          fill="none"
+                          stroke-linecap="round"/>
+                </svg>
+            </label>
+        </div>
+
+        <nav class="nav">
+            <a href="{% url 'moi_garaje' %}" class="nav__link">Мой гараж</a>
+            <a href="{% url 'moi_zapis' %}" class="nav__link">Мои записи</a>
+            <a href="{% url 'uslugi' %}" class="nav__link">Каталог</a>
+            <a href="{% url 'vhod' %}" class="nav__link">Вход</a>
+            <a href="{% url 'registracia' %}" class="nav__link">Регистрация</a>
+            <a href="#" class="nav__link nav__link--mobile">Профиль</a>
+        </nav>
+
+        <div class="profile-wrapper">
+            <a href="#" class="profile">
+                <span class="profile__icon"></span>
+                <span>Профиль</span>
+            </a>
+
+            <div class="profile-dropdown">
+                <a href="{% url 'profil' %}" class="dropdown-item">
+                    <img src="{% static 'img/Vector.png' %}" alt="">
+                    Профиль
+                </a>
+
+                <a href="{% url 'moi_garaje' %}" class="dropdown-item">
+                    <img src="{% static 'img/Group.png' %}" alt="">
+                    Мой гараж
+                </a>
+
+                <a href="{% url 'moi_zapis' %}" class="dropdown-item">
+                    <img src="{% static 'img/repayment-date-svgrepo-com.png' %}" alt="">
+                    Мои записи
+                </a>
+
+                <div class="dropdown-divider"></div>
+
+                <a href="{% url 'main' %}" class="dropdown-item logout">
+                    <img src="{% static 'img/Vector(1).png' %}" alt="">
+                    Выйти
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <label for="burger" class="nav-overlay"></label>
+</header>
+
+<main>
+    <section class="profile-page">
+        <div class="container">
+
+            <h1 class="profile-page__title">Профиль</h1>
+
+            <div class="profile-card">
+
+                <h2 class="profile-card__subtitle">
+                    Личные данные мастера
+                </h2>
+
+                <!-- Аватар -->
+                <div class="profile-avatar">
+                    <div class="profile-avatar__circle"></div>
+                    <button type="button" class="profile-avatar__btn">
+                        Изменить фото
+                    </button>
+                </div>
+
+                <form class="profile-form" id="profileForm" action="#" method="POST" novalidate>
+    {% csrf_token %}
+
+    <!-- Специальность -->
+    <div class="profile-form__group" data-field="specialty">
+        <label class="profile-form__label" for="specialty">Специальность</label>
+
+        <div class="profile-form__select-wrapper">
+            <select
+                class="profile-form__select"
+                id="specialty"
+                name="specialty"
+                required>
+                <option value="" disabled selected>Выберите специальность</option>
+                <option value="electric">Электрик</option>
+                <option value="mechanic">Механик</option>
+                <option value="diagnost">Диагност</option>
+            </select>
+
+            <img src="{% static 'img/arrow-down.png' %}" alt="" class="select-icon">
+        </div>
+
+        <span class="profile-form__error" data-error-for="specialty"></span>
+    </div>
+
+    <!-- Имя -->
+    <div class="profile-form__group" data-field="name">
+        <label class="profile-form__label" for="name">Имя</label>
+
+        <input
+            type="text"
+            class="profile-form__input"
+            id="name"
+            name="name"
+            value="Мария"
+            placeholder="Введите имя"
+            autocomplete="name"
+            required>
+
+        <span class="profile-form__error" data-error-for="name"></span>
+    </div>
+
+    <!-- Email -->
+    <div class="profile-form__group" data-field="email">
+        <label class="profile-form__label" for="email">Email</label>
+
+        <input
+            type="email"
+            class="profile-form__input"
+            id="email"
+            name="email"
+            value="vmv@gmail.com"
+            placeholder="Введите email"
+            autocomplete="email"
+            required>
+
+        <span class="profile-form__error" data-error-for="email"></span>
+    </div>
+
+    <!-- Телефон -->
+    <div class="profile-form__group" data-field="phone">
+        <label class="profile-form__label" for="phone">Телефон</label>
+
+        <input
+            type="tel"
+            class="profile-form__input"
+            id="phone"
+            name="phone"
+            value="+78005553535"
+            placeholder="+78005553535"
+            autocomplete="tel"
+            required>
+
+        <span class="profile-form__error" data-error-for="phone"></span>
+    </div>
+
+    <!-- Кнопка -->
+    <button type="submit" class="profile-form__submit" id="profileSubmit">
+        Сохранить изменения
+    </button>
+
+    <!-- Общее сообщение -->
+    <div class="profile-form__message" id="profileMessage" role="status" aria-live="polite"></div>
+</form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container footer__inner">
+
+        <div class="footer__column">
+            <img
+                src="{% static 'img/logo.png' %}"
+                alt="СТО"
+                class="footer__logo">
+
+            <p class="footer__description">
+                Платформа для онлайн-записи на ТО, удобно для водителей
+            </p>
+        </div>
+
+        <div class="footer__column">
+            <h3>Для клиентов</h3>
+            <a href="{% url 'moi_garaje' %}">Мой гараж</a>
+            <a href="{% url 'moi_zapis' %}">Мои записи</a>
+            <a href="{% url 'uslugi' %}">Записаться</a>
+            <a href="{% url 'mastera' %}">Мастера</a>
+        </div>
+
+        <div class="footer__column">
+            <h3>Для сотрудников</h3>
+            <a href="#">Работа у нас</a>
+            <a href="{% url 'vhod_sotr' %}">Вход как мастер</a>
+        </div>
+
+        <div class="footer__column">
+            <h3>Контакты</h3>
+            <a href="tel:+78005553535">+78005553535</a>
+            <a href="mailto:support@sto.ru">support@sto.ru</a>
+            <span>Ульяновск, Россия</span>
+        </div>
+
+    </div>
+</footer>
+<script>
+(function () {
+    "use strict";
+
+    const form = document.getElementById("profileForm");
+    if (!form) return;
+
+    const messageBox = document.getElementById("profileMessage");
+    const submitBtn = document.getElementById("profileSubmit");
+
+    /* ---------- Правила ---------- */
+    const rules = {
+        specialty: {
+            validate: (v) => v !== "",
+            message: "Выберите специальность"
+        },
+        name: {
+            validate: (v) => /^[А-Яа-яЁёA-Za-z\s-]{2,}$/.test(v.trim()),
+            message: "Имя: минимум 2 буквы, только буквы, пробел и дефис"
+        },
+        email: {
+            validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+            message: "Введите корректный email, например name@mail.ru"
+        },
+        phone: {
+            validate: (v) => /^\+?\d{11,12}$/.test(v.trim().replace(/[\s()-]/g, "")),
+            message: "Телефон: 11–12 цифр, можно с + в начале"
+        }
+    };
+
+    
+    function getGroup(name) {
+        return form.querySelector(`.profile-form__group[data-field="${name}"]`);
+    }
+
+    function getInput(name) {
+        return form.querySelector(`[name="${name}"]`);
+    }
+
+    function setError(name, text) {
+        const group = getGroup(name);
+        const errorEl = form.querySelector(`[data-error-for="${name}"]`);
+        if (!group || !errorEl) return;
+        group.classList.add("has-error");
+        group.classList.remove("is-valid");
+        errorEl.textContent = text;
+    }
+
+    function clearError(name) {
+        const group = getGroup(name);
+        const errorEl = form.querySelector(`[data-error-for="${name}"]`);
+        if (!group || !errorEl) return;
+        group.classList.remove("has-error");
+        errorEl.textContent = "";
+    }
+
+    function markValid(name) {
+        const group = getGroup(name);
+        if (!group) return;
+        group.classList.remove("has-error");
+        group.classList.add("is-valid");
+    }
+
+    function validateField(name) {
+        const input = getInput(name);
+        const rule = rules[name];
+        if (!input || !rule) return true;
+
+        const value = input.value;
+        if (rule.validate(value)) {
+            clearError(name);
+            markValid(name);
+            return true;
+        }
+        setError(name, rule.message);
+        return false;
+    }
+
+    function showMessage(text, type) {
+        if (!messageBox) return;
+        messageBox.textContent = text;
+        messageBox.className = "profile-form__message profile-form__message--" + type;
+        if (type === "success") {
+            setTimeout(() => {
+                messageBox.className = "profile-form__message";
+                messageBox.textContent = "";
+            }, 4000);
+        }
+    }
+
+    
+    Object.keys(rules).forEach((name) => {
+        const input = getInput(name);
+        if (!input) return;
+
+        
+        input.addEventListener("blur", () => validateField(name));
+
+        
+        input.addEventListener("input", () => {
+            clearError(name);
+            if (getGroup(name)?.classList.contains("is-valid")) {
+                validateField(name);
+            }
+        });
+
+        if (input.tagName === "SELECT") {
+            input.addEventListener("change", () => validateField(name));
+        }
+    });
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let firstInvalid = null;
+        let allValid = true;
+
+        Object.keys(rules).forEach((name) => {
+            const ok = validateField(name);
+            if (!ok && !firstInvalid) {
+                firstInvalid = getInput(name);
+            }
+            if (!ok) allValid = false;
+        });
+
+        if (!allValid) {
+            showMessage("Проверьте выделенные поля", "error");
+            if (firstInvalid) firstInvalid.focus();
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Сохранение...";
+
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            showMessage("Изменения сохранены", "success");
+        }, 700);
+    });
+})();
+</script>
+</body>
+</html>
