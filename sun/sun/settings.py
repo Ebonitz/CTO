@@ -11,11 +11,93 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)   # создаём папку, если её нет
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    # Формат сообщений
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name} {module}:{lineno} — {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        'simple': {
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+
+    # Куда писать
+    'handlers': {
+        'file_errors': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'errors.log'),
+            'maxBytes': 5 * 1024 * 1024,   # 5 МБ
+            'backupCount': 5,              # хранить 5 архивных файлов
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'file_warnings': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'warnings.log'),
+            'maxBytes': 5 * 1024 * 1024,
+            'backupCount': 3,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+
+    # Логгеры
+    'loggers': {
+        # Все ошибки Django (500, ошибки middleware и т.д.)
+        'django': {
+            'handlers': ['file_errors', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        # Ошибки запросов (django.request) — сюда попадают 500-е
+        'django.request': {
+            'handlers': ['file_errors'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Ошибки БД
+        'django.db.backends': {
+            'handlers': ['file_errors'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Ваше приложение
+        'app': {
+            'handlers': ['file_errors', 'file_warnings', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+
+    # Корневой логгер (на случай, если что-то не попало в конкретные)
+    'root': {
+        'handlers': ['file_errors', 'console'],
+        'level': 'WARNING',
+    },
+}
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
@@ -26,7 +108,6 @@ SECRET_KEY = 'django-insecure-36=u^g_)7+g$*jft5ug+=!dgs9v167q8%ki7ci%gawu%$k%8k%
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
